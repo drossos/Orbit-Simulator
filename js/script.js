@@ -13,7 +13,7 @@ var addPlanet = $("#addPlanet");
 var radiusInput = $("#radiusInput"), massInput = $("#massInput"),distanceInput=$("#distanceInput");
 var allFields = $( [] ).add( radiusInput ).add( massInput ).add( distanceInput );
 
-var planetsArr = {};
+var planetsArr = [];
 var numPlanets = 0;
 $( function() {
     $( "#dialog" ).dialog({
@@ -21,7 +21,9 @@ $( function() {
       modal:true,
       buttons:{
         "Create Planet" : function (){
-          addToPlanetArr("central", "#FF0000", canvas.width / 4, canvas.height / 4, 100, 50);
+         addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 30, 10);
+          addToPlanetArr("test0", "#FF0000", canvas.width / 4, canvas.height / radii[0], 30, 50);
+          //addToPlanetArr("test1", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 20, 50);
           $(this).dialog("close");
         }
       }
@@ -57,27 +59,33 @@ Planet.prototype.build = function() {
 var center = new Planet("central", "#FF0000", canvas.width / 2, canvas.height / 2, 100, 50);
 center.build();
 
-var testSatlite = new Planet("satalite", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 30, 10);
-testSatlite.build();
+/*var testSatlite = new Planet("satalite", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 30, 10);
+testSatlite.build();*/
 
-var radius = getRadius(testSatlite);
+/*var radius = getRadius(testSatlite);*/
 
 function animate() {
 
+for (i =0; i < planetsArr.length;i++){
+radius = getRadius(planetsArr[i][0]);
 var testX = center.x - (radius * Math.cos(angle));
 var testY = center.y + (radius * Math.sin(angle));
-testSatlite.x = testX;
-testSatlite.y = testY;
+planetsArr[i][0].x = testX;
+planetsArr[i][0].y = testY;
+var temp = planetsArr[i][0].name;
 //right now does not return to origin pos
 
-    jCanvas.animateLayer('satalite', {
+    jCanvas.animateLayer(temp, {
         x: testX,
         y: testY,
-        width: 30,
-        height: 30
-    }, 10);
+        width: planetsArr[i][0].radius,
+        height: planetsArr[i][0].radius
+    }, 100);
+//todo makes so each has unique speed
+   // planetsArr[i][1]-= speed;
+   angle -= speed;
 
-    angle-= speed;
+  }
 }
 
 function getRadius(planet) {
@@ -87,8 +95,8 @@ function getRadius(planet) {
 
 //todo make better way to add general planet
 function addToPlanetArr (name, fill, xPos, yPos, radius, mass){
-  planetsArr[numPlanets] = new Planet("testo", "#FF0000", canvas.width / 4, canvas.height / 4, 20, 50);
-  planetsArr[numPlanets].build(); 
+  planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass),80]);
+  planetsArr[numPlanets][0].build(); 
   numPlanets++;
 }
-setInterval(animate, 20);
+setInterval(animate, 10);
