@@ -5,14 +5,15 @@ canvas.style.background = raceBColor;
 var angle = 80;
 var speed = .05;
 var jCanvas = $('#canvas');
-
+var G = 6.67e-11;
+var circleDegree = 360;
 var radii = [3]
 var addUser;
 var addPlanet = $("#addPlanet");
-
+var triangleArea = 0;
 var radiusInput = $("#radiusInput"), massInput = $("#massInput"),distanceInput=$("#distanceInput");
 var allFields = $( [] ).add( radiusInput ).add( massInput ).add( distanceInput );
-
+//planetsArr struct [planet, starting angle, speed]
 var planetsArr = [];
 var numPlanets = 0;
 $( function() {
@@ -66,14 +67,13 @@ testSatlite.build();*/
 
 function animate() {
 
-for (i =0; i < planetsArr.length;i++){
+for (var i =0; i < planetsArr.length;i++){
 radius = getRadius(planetsArr[i][0]);
-var testX = center.x - (radius * Math.cos(angle));
-var testY = center.y + (radius * Math.sin(angle));
+var testX = center.x - (radius * Math.cos(planetsArr[i][1]));
+var testY = center.y + (radius * Math.sin(planetsArr[i][1]));
 planetsArr[i][0].x = testX;
 planetsArr[i][0].y = testY;
 var temp = planetsArr[i][0].name;
-//right now does not return to origin pos
 
     jCanvas.animateLayer(temp, {
         x: testX,
@@ -81,9 +81,9 @@ var temp = planetsArr[i][0].name;
         width: planetsArr[i][0].radius,
         height: planetsArr[i][0].radius
     }, 100);
-//todo makes so each has unique speed
+    //todo makes so each has unique speed
    // planetsArr[i][1]-= speed;
-   angle -= speed;
+   planetsArr[i][1] -= getAngleChange();
 
   }
 }
@@ -95,8 +95,27 @@ function getRadius(planet) {
 
 //todo make better way to add general planet
 function addToPlanetArr (name, fill, xPos, yPos, radius, mass){
-  planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass),80]);
-  planetsArr[numPlanets][0].build(); 
+  var tempSpeed = getTanVelocity(new Planet(name, fill, xPos, yPos, radius, mass));
+  planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass),tempSpeed]);
+  planetsArr[numPlanets][0].build();
   numPlanets++;
 }
+
+function getTanVelocity(planet){
+    //root(GM/R)
+    return Math.sqrt(G * center.mass / getRadius(planet));
+}
+
+//using Kepler third law
+function getOrbitTime(planetIndex){
+    var totalPeriod = 2 * Math.pi * Math.sqrt(Math.pow(getRadius(planetsArr[planetIndex][0]),3)/(G*center.mass));
+    //find what percentage of period is being traveled
+    //TODO IF MAKE ELIPSE ORBITS NEED TO CHANGE THIS PORTION AS TIME CHANGES WITH DISTANCE OF TIME
+    return speed/360 * totalPeriod;
+}
+
+function getAngleChange(){
+
+}
+
 setInterval(animate, 10);
