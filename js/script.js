@@ -130,7 +130,7 @@ function getAngleChange(planetIndex) {
     //omega * t = theta
     //right now sense of scale is so small that no noticable change
     //TODO MAKE A SCALE SO IT ALL WORKS VISUALLY
-    return angVelo * Math.pow(orbitTime,1.5);
+    return angVelo * 1/orbitTime * 10e9;
 
 }
 
