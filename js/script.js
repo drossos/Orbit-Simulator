@@ -57,6 +57,7 @@ Planet.prototype.build = function() {
         width: this.radius,
         height: this.radius
     }).drawLayers();
+
 };
 
 var center = new Planet("central", "#FF0000", canvas.width / 2, canvas.height / 2, 100, 50);
@@ -73,7 +74,7 @@ function animate() {
     for (var i = 0; i < planetsArr.length; i++) {
 
         //todo makes so each has unique speed
-       // planetsArr[i][1] -= speed;
+        // planetsArr[i][1] -= speed;
         planetsArr[i][1] -= getAngleChange(i);
 
         radius = getRadius(planetsArr[i][0]);
@@ -95,27 +96,28 @@ function animate() {
 }
 
 function getRadius(planet) {
-    var test = Math.sin(30);
+   // var test = Math.sin(30);
     return Math.sqrt(Math.pow(Math.abs(planet.x - center.x), 2) + Math.pow(Math.abs(planet.y - center.y), 2));
 }
 
 //todo make better way to add general planet
 function addToPlanetArr(name, fill, xPos, yPos, radius, mass) {
     var tempSpeed = getTanVelocity(new Planet(name, fill, xPos, yPos, radius, mass));
-    planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass),90, tempSpeed]);
+    planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass), 90, tempSpeed]);
     planetsArr[numPlanets][0].build();
+    buildOrbitPath(planetsArr[numPlanets][0]);
     numPlanets++;
 }
 
 function getTanVelocity(planet) {
     //root(GM/R)
     return Math.sqrt(G * center.mass / getRadius(planet));
-    
+
 }
 
 //using Kepler third law
 function getOrbitRefreshTime(planetIndex) {
-  var temp = Math.pow(getRadius(planetsArr[planetIndex][0]), 3);
+    var temp = Math.pow(getRadius(planetsArr[planetIndex][0]), 3);
     var totalPeriod = 2 * Math.PI * Math.sqrt(Math.pow(getRadius(planetsArr[planetIndex][0]), 3) / (G * center.mass));
     //find what percentage of period is being traveled
     //TODO IF MAKE ELIPSE ORBITS NEED TO CHANGE THIS PORTION AS TIME CHANGES WITH DISTANCE OF TIME
@@ -130,8 +132,24 @@ function getAngleChange(planetIndex) {
     //omega * t = theta
     //right now sense of scale is so small that no noticable change
     //TODO MAKE A SCALE SO IT ALL WORKS VISUALLY
-    return angVelo * 1/orbitTime * 10e9;
+    return angVelo * 1 / orbitTime * 10e9;
 
+}
+
+//build orbit path
+function buildOrbitPath (planet){
+    var radius = getRadius(planet);
+
+    jCanvas.addLayer({
+        name: planet.name + "Orbit",
+        type: 'ellipse',
+        strokeStyle: '#36c',
+        strokeWidth: 4,
+        x: center.x,
+        y: center.y,
+        width: radius,
+        height: radius
+    }).drawLayers();
 }
 
 setInterval(animate, 10);
