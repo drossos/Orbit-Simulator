@@ -11,17 +11,17 @@
 	</head>
 	<body>
 		<h1> Your Boys Grav Sim XD</h1>
-		<canvas id="canvas" height="500px" width="700px"></canvas>
+		<canvas id="canvas" height="1000px" width="1000px"></canvas>
 		
 		<div id="dialog" title="Create new Planet">
 			<p class="validateTips">All form fields are required.</p>
 			<form>
 				<fieldset>
-					<label for="radiusInput">Radius</label>
+					<label for="radiusInput">Radius (km)</label>
 					<input type="text" name="radiusInput" id="radiusInput" value="40" class="text ui-widget-content ui-corner-all">
-					<label for="massInput">Mass</label>
+					<label for="massInput">Mass (kg)</label>
 					<input type="text" name="massInput" id="massInput" value="50" class="text ui-widget-content ui-corner-all">
-					<label for="distanceInput">Distance</label>
+					<label for="distanceInput">Distance (AU)</label>
 					<input type="text" name="distanceInput" id="distanceInput" value="45" class="text ui-widget-content ui-corner-all">
 					
 					<!-- Allow form submission with keyboard without duplicating the dialog button -->
@@ -29,7 +29,9 @@
 				</fieldset>
 			</form>
 		</div>
-		
+		<div id="orbitInfo">
+			<p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+		</div>
 		
 		<button id="addPlanet">Click to Add Planet</button>
 		<script type="text/javascript"  src="js/jquery.js"></script>

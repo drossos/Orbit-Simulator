@@ -15,17 +15,29 @@ var radiusInput = $("#radiusInput"),
     massInput = $("#massInput"),
     distanceInput = $("#distanceInput");
 var allFields = $([]).add(radiusInput).add(massInput).add(distanceInput);
+var orbitInfo = $('#orbitInfo');
 //planetsArr struct [planet, starting angle, speed]
 var planetsArr = [];
 var numPlanets = 0;
+var pixelToAU = 100;
+var middle = canvas.width / 2;
+var oneAU = 149597900000;
+
+var massEarth = 5.972e24;
+var massSun = 1.989e30;
+orbitInfo.dialog({
+  autoOpen: false
+});
+
+
 $(function() {
     $("#dialog").dialog({
         autoOpen: false,
         modal: true,
         buttons: {
             "Create Planet": function() {
-                addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 30, 10);
-                addToPlanetArr("test0", "#FF0000", canvas.width / 2, canvas.height / 6, 30, 50);
+                addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, middle - pixelToAU, 30, massEarth);
+                addToPlanetArr("test0", "#FF0000", canvas.width / 2, middle -  4*pixelToAU, 30, 50);
                 //addToPlanetArr("test1", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 20, 50);
                 $(this).dialog("close");
             }
@@ -55,12 +67,39 @@ Planet.prototype.build = function() {
         x: this.x,
         y: this.y,
         width: this.radius,
-        height: this.radius
+        height: this.radius,
+        mouseover: function(layer){
+        orbitInfo.dialog('open');
+        }
     }).drawLayers();
 
 };
 
-var center = new Planet("central", "#FF0000", canvas.width / 2, canvas.height / 2, 100, 50);
+function CenterPlanet(name, fill, radius, mass) {
+    this.name = name;
+    this.fill = fill;
+    this.radius = radius;
+    this.mass = mass;
+}
+
+CenterPlanet.prototype.build = function() {
+
+    jCanvas.addLayer({
+        name: this.name,
+        fillStyle: this.fill,
+        type: 'ellipse',
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        width: this.radius,
+        height: this.radius,
+        mouseover: function(layer){
+          orbitInfo.dialog('open');
+        }
+    }).drawLayers();
+
+};
+
+var center = new Planet("central", "#FF0000", canvas.width / 2, canvas.height / 2, 100, massSun);
 center.build();
 
 /*var testSatlite = new Planet("satalite", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 30, 10);
@@ -75,10 +114,10 @@ function animate() {
 
         //todo makes so each has unique speed
         // planetsArr[i][1] -= speed;
-        planetsArr[i][1] -= getAngleChange(i);
+        planetsArr[i][1] += getAngleChange(i);
 
         radius = getRadius(planetsArr[i][0]);
-        var testX = center.x - (radius * Math.cos(planetsArr[i][1]));
+        var testX = center.x + (radius * Math.cos(planetsArr[i][1]));
         var testY = center.y + (radius * Math.sin(planetsArr[i][1]));
         planetsArr[i][0].x = testX;
         planetsArr[i][0].y = testY;
@@ -89,7 +128,7 @@ function animate() {
             y: testY,
             width: planetsArr[i][0].radius,
             height: planetsArr[i][0].radius
-        }, 100);
+        }, 10);
 
 
     }
@@ -103,7 +142,7 @@ function getRadius(planet) {
 //todo make better way to add general planet
 function addToPlanetArr(name, fill, xPos, yPos, radius, mass) {
     var tempSpeed = getTanVelocity(new Planet(name, fill, xPos, yPos, radius, mass));
-    planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass), 90, tempSpeed]);
+    planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass), angle, tempSpeed]);
     planetsArr[numPlanets][0].build();
     buildOrbitPath(planetsArr[numPlanets][0]);
     numPlanets++;
@@ -111,16 +150,21 @@ function addToPlanetArr(name, fill, xPos, yPos, radius, mass) {
 
 function getTanVelocity(planet) {
     //root(GM/R)
-    return Math.sqrt(G * center.mass / getRadius(planet));
+    //take radius/pixelToAU to see number of au then mult to get metere
+    return Math.sqrt(G * center.mass / (getRadius(planet)/pixelToAU * oneAU));
 
 }
 
 //using Kepler third law
+/*
+T = 2*pi*root(a^3/GM)
+*/
 function getOrbitRefreshTime(planetIndex) {
     var temp = Math.pow(getRadius(planetsArr[planetIndex][0]), 3);
-    var totalPeriod = 2 * Math.PI * Math.sqrt(Math.pow(getRadius(planetsArr[planetIndex][0]), 3) / (G * center.mass));
+    var totalPeriod = 2 * Math.PI * Math.sqrt(Math.pow(getRadius(planetsArr[planetIndex][0])/pixelToAU * oneAU, 3) / (G * center.mass));
     //find what percentage of period is being traveled
     //TODO IF MAKE ELIPSE ORBITS NEED TO CHANGE THIS PORTION AS TIME CHANGES WITH DISTANCE OF TIME
+    //speed meaning how much of orbit per animate cycle
     return speed / 360 * totalPeriod;
 }
 
@@ -128,11 +172,13 @@ function getOrbitRefreshTime(planetIndex) {
 function getAngleChange(planetIndex) {
     var orbitTime = getOrbitRefreshTime(planetIndex);
     //omega = v/r
-    var angVelo = getTanVelocity(planetsArr[planetIndex][0]) / getRadius(planetsArr[planetIndex][0]);
+    var angVelo = getTanVelocity(planetsArr[planetIndex][0]) / (getRadius(planetsArr[planetIndex][0]) /pixelToAU * oneAU);
+  //  var orbitalSpeed = getTanVelocity(planetsArr[planetIndex][0]);
     //omega * t = theta
     //right now sense of scale is so small that no noticable change
     //TODO MAKE A SCALE SO IT ALL WORKS VISUALLY
-    return angVelo * 1 / orbitTime * 10e9;
+    //return angVelo * 1 / orbitTime * 10e9;
+    return angVelo * orbitTime;
 
 }
 
@@ -142,14 +188,15 @@ function buildOrbitPath (planet){
 
     jCanvas.addLayer({
         name: planet.name + "Orbit",
-        type: 'ellipse',
+        type: 'arc',
+        index:0,
         strokeStyle: '#36c',
         strokeWidth: 4,
-        x: center.x,
-        y: center.y,
-        width: radius,
-        height: radius
+        x: middle,
+        y: middle,
+       radius:radius
     }).drawLayers();
 }
+
 
 setInterval(animate, 10);
