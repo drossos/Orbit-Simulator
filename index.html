@@ -11,29 +11,54 @@
 	</head>
 	<body>
 		<h1> Your Boys Grav Sim XD</h1>
-		<canvas id="canvas" height="1000px" width="1000px"></canvas>
-		
+		<hr>
+		<div id="simulator" >
+			<canvas id="canvas" height="1000px" width="1000px" style="display: inline;"></canvas>
+		</div>
+		<div id="optionsSide">
+			<button class="button" id="addPlanet">Click to Add Planet</button>
+			<button id = "editCenter">Change center properties</button>
+		</div>
 		<div id="dialog" title="Create new Planet">
 			<p class="validateTips">All form fields are required.</p>
 			<form>
 				<fieldset>
 					<label for="radiusInput">Radius (km)</label>
-					<input type="text" name="radiusInput" id="radiusInput" value="40" class="text ui-widget-content ui-corner-all">
-					<label for="massInput">Mass (kg)</label>
-					<input type="text" name="massInput" id="massInput" value="50" class="text ui-widget-content ui-corner-all">
+					<input type="text" name="radiusInput" id="radiusInput" value="20" class="text ui-widget-content ui-corner-all">
+					<label for="massInput">Mass(kg) [use sci notiation eg 1e4]</label>
+					<input type="text" name="massInput" id="massInput" value="5.972e24" class="text ui-widget-content ui-corner-all">
 					<label for="distanceInput">Distance (AU)</label>
-					<input type="text" name="distanceInput" id="distanceInput" value="45" class="text ui-widget-content ui-corner-all">
+					<input type="text" name="distanceInput" id="distanceInput" value="1" class="text ui-widget-content ui-corner-all">
 					
 					<!-- Allow form submission with keyboard without duplicating the dialog button -->
 					<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
 				</fieldset>
 			</form>
 		</div>
+
+		<div id="editCenterDialog" title="Edit Center">
+			<p class="validateTips">All form fields are required.</p>
+			<form>
+				<fieldset>
+					
+					<label for="centerMassInput">Mass(kg) [use sci notiation eg 1e4]</label>
+					<input type="text" name="centerMassInput" id="centerMassInput" value="5.972e24" class="text ui-widget-content ui-corner-all">
+					
+					
+					<!-- Allow form submission with keyboard without duplicating the dialog button -->
+					<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+				</fieldset>
+			</form>
+		</div>
+
 		<div id="orbitInfo">
-			<p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+			
+		</div>
+		<div id="centralInfo">
+			
 		</div>
 		
-		<button id="addPlanet">Click to Add Planet</button>
+		
 		<script type="text/javascript"  src="js/jquery.js"></script>
 		<script type="text/javascript" src = "js/jquery-ui.js"></script>
 		<script type="text/javascript"  src="js/jcanvas.js"></script>

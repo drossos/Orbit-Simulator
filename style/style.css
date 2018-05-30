@@ -1,0 +1,28 @@
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0px;
+}
+
+body{
+	background-color: #AE78FF;
+}
+
+canvas{
+	background-image: url(../images/bkgrnd.jpg);
+	background-size: cover;
+}
+
+#optionsSide{
+	display: inline-block;
+	float: left;
+	clear: both;
+}
+
+#simulator{
+	text-align: center;
+	display: inline-block;
+	float: middle;
+	clear: both;
+
+}
