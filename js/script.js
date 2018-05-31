@@ -21,6 +21,8 @@ var allFields = $([]).add(radiusInput).add(massInput).add(distanceInput);
 var orbitInfo = $('#orbitInfo');
 var centeralInfo = $('#centralInfo');
 
+var colourArr = ["#275AFF", "#2DFA32", "#32FFF3","#FF740E"];
+
 //planetsArr struct [planet, starting angle, speed]
 
 var planetsArr = [];
@@ -28,6 +30,8 @@ var numPlanets = 0;
 var pixelToAU = 50;
 var middle = canvas.width / 2;
 var oneAU = 149597900000;
+var secondsPerYear = 31557600;
+var mPerSToKmPerH = 3.6
 //standard 10 sec orbit *orbit of earth*
 //TODO ADD SO CAN CHANGE SPEED OF ANIMATION
 var standardOrbitPeriod = 31563692.627345186;
@@ -50,8 +54,9 @@ $(function() {
         modal: true,
         buttons: {
             "Create Planet": function() {
+                
                 //addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, middle - pixelToAU, 20, massEarth);
-                addToPlanetArr("test" + planetsArr.length, "#FF0000", canvas.width / 2, middle - Number(distanceInput.val()) * pixelToAU, Number(radiusInput.val()), Number(massInput.val()));
+                addToPlanetArr("test" + planetsArr.length, colourArr[Math.floor(Math.random()*colourArr.length)], canvas.width / 2, middle - Number(distanceInput.val()) * pixelToAU, Number(radiusInput.val()), Number(massInput.val()));
                 //addToPlanetArr("test1", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 20, 50);
                 $(this).dialog("close");
             }
@@ -111,8 +116,8 @@ Planet.prototype.build = function() {
                     planetTempIndex = i;
             }
             var planet = planetsArr[planetTempIndex][0];
-            document.getElementById("orbitInfo").innerHTML = "Mass: " + planet.mass + "kg<br>Tangent Velocity: " + getTanVelocity(planet)
-            +"m/s<br>Period: " + getOrbitRefreshTime(planetTempIndex)+"sec";
+            document.getElementById("orbitInfo").innerHTML = "Mass: " + (planet.mass).toFixed(3) + "kg<br>Tangent Velocity: " + (getTanVelocity(planet)*3.6).toFixed(3)
+            +"km/h<br>Period: " + (getOrbitRefreshTime(planetTempIndex)/secondsPerYear).toFixed(3)+"years";
             orbitInfo.dialog('open');
         }
     }).drawLayers();
@@ -125,8 +130,7 @@ function CenterPlanet(name, fill, radius, mass) {
     this.radius = radius;
     this.mass = mass;
     this.x = middle,
-        this.y = middle
-
+    this.y = middle
 }
 
 CenterPlanet.prototype.build = function() {
@@ -140,7 +144,7 @@ CenterPlanet.prototype.build = function() {
         width: this.radius,
         height: this.radius,
         mouseover: function(layer) {
-            document.getElementById("centralInfo").innerHTML = "Mass: " + center.mass + "kg";
+            document.getElementById("centralInfo").innerHTML = "Mass: " + (center.mass).toFixed(3) + "kg";
             centeralInfo.dialog('open');
         }
     }).drawLayers();
