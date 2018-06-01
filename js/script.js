@@ -3,6 +3,7 @@ initCanvas();
 var context = canvas.getContext("2d");
 var raceBColor = "black";
 canvas.style.background = raceBColor;
+var validNums = "1234567890e";
 var angle = 90;
 //the rate at which the simulation runs
 var speed = .00125;
@@ -13,6 +14,7 @@ var radii = [3]
 var addUser;
 var addPlanet = $("#addPlanet");
 var editCenter = $("#editCenter");
+var clearPlanets = $("#clearPlanets");
 var triangleArea = 0;
 var radiusInput = $("#radiusInput"),
     massInput = $("#massInput"),
@@ -21,19 +23,19 @@ var allFields = $([]).add(radiusInput).add(massInput).add(distanceInput);
 var orbitInfo = $('#orbitInfo');
 var centeralInfo = $('#centralInfo');
 
-var colourArr = ["#275AFF", "#2DFA32", "#32FFF3","#FF740E"];
+var colourArr = ["#275AFF", "#2DFA32", "#32FFF3", "#FF740E"];
 
 //planetsArr struct [planet, starting angle, speed]
 
 var planetsArr = [];
 var numPlanets = 0;
-var pixelToAU = 50;
+var pixelToAU = 60;
 var middle = canvas.width / 2;
 var oneAU = 149597900000;
 var secondsPerYear = 31557600;
 var mPerSToKmPerH = 3.6
-//standard 10 sec orbit *orbit of earth*
-//TODO ADD SO CAN CHANGE SPEED OF ANIMATION
+    //standard 10 sec orbit *orbit of earth*
+    //TODO ADD SO CAN CHANGE SPEED OF ANIMATION
 var standardOrbitPeriod = 31563692.627345186;
 var animationRefreshRate = .0125
 var relativeOrbitPeriod = 10;
@@ -47,6 +49,10 @@ centeralInfo.dialog({
 });
 
 
+$("#nonNumPrompt").dialog({
+    autoOpen: false,
+    modal: true
+});
 
 $(function() {
     $("#dialog").dialog({
@@ -54,11 +60,20 @@ $(function() {
         modal: true,
         buttons: {
             "Create Planet": function() {
-                
-                //addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, middle - pixelToAU, 20, massEarth);
-                addToPlanetArr("test" + planetsArr.length, colourArr[Math.floor(Math.random()*colourArr.length)], canvas.width / 2, middle - Number(distanceInput.val()) * pixelToAU, Number(radiusInput.val()), Number(massInput.val()));
-                //addToPlanetArr("test1", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 20, 50);
-                $(this).dialog("close");
+                var valid = false;
+
+                if (isNaN(distanceInput.val()) || isNaN(radiusInput.val()) || isNaN(massInput.val())) {
+                    valid = false;
+                    $("#nonNumPrompt").dialog("open");
+                } else {
+                    valid = true;
+
+
+                    //addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, middle - pixelToAU, 20, massEarth);
+                    addToPlanetArr("test" + planetsArr.length, colourArr[Math.floor(Math.random() * colourArr.length)], canvas.width / 2, middle - Number(distanceInput.val()) * pixelToAU, Number(radiusInput.val()) / 318.55, Number(massInput.val()));
+                    //addToPlanetArr("test1", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 20, 50);
+                    $(this).dialog("close");
+                }
             }
         }
     });
@@ -71,6 +86,21 @@ $(function() {
         buttons: {
             "Edit Center Planet": function() {
                 center.mass = Number($("#centerMassInput").val());
+                //to update the visual speeds of orbits
+                var temp =  planetsArr;
+                planetsArr = [];
+                numPlanets=0;
+                for (i = 0; i < temp.length; i++) {
+                    jCanvas.removeLayer(temp[i][0].name + "Orbit");
+                    jCanvas.removeLayer(temp[i][0].name);
+                    addToPlanetArrAlt(temp[i][0]);
+
+                }
+
+                
+                
+
+
                 $(this).dialog("close");
             }
         }
@@ -81,14 +111,25 @@ addPlanet.button().on("click", function() {
     $("#dialog").dialog("open");
 });
 
-editCenter.button().on("click", function(){
+editCenter.button().on("click", function() {
     $("#editCenterDialog").dialog("open");
 });
+
+clearPlanets.button().on("click", function() {
+
+    for (i = 0; i < planetsArr.length; i++) {
+        jCanvas.removeLayer(planetsArr[i][0].name + "Orbit");
+        jCanvas.removeLayer(planetsArr[i][0].name);
+    }
+    planetsArr = [];
+});
+
 
 function initCanvas() {
     canvas.width = document.body.clientHeight - 100;
     canvas.height = document.body.clientHeight - 100;
 }
+
 
 function Planet(name, fill, xPos, yPos, radius, mass) {
     this.name = name;
@@ -111,13 +152,13 @@ Planet.prototype.build = function() {
         height: this.radius,
         mouseover: function(layer) {
             var planetTempIndex = -1;
-            for (i=0; i < planetsArr.length;i++){
+            for (i = 0; i < planetsArr.length; i++) {
                 if (planetsArr[i][0].name === id)
                     planetTempIndex = i;
             }
             var planet = planetsArr[planetTempIndex][0];
-            document.getElementById("orbitInfo").innerHTML = "Mass: " + (planet.mass).toFixed(3) + "kg<br>Tangent Velocity: " + (getTanVelocity(planet)*3.6).toFixed(3)
-            +"km/h<br>Period: " + (getOrbitRefreshTime(planetTempIndex)/secondsPerYear).toFixed(3)+"years";
+            document.getElementById("orbitInfo").innerHTML = "Mass: " + (planet.mass).toFixed(3) + "kg<br>Tangent Velocity: " + (getTanVelocity(planet) * 3.6).toFixed(3) +
+                "km/h<br>Period: " + (getOrbitRefreshTime(planetTempIndex) / secondsPerYear).toFixed(3) + "years";
             orbitInfo.dialog('open');
         }
     }).drawLayers();
@@ -130,8 +171,9 @@ function CenterPlanet(name, fill, radius, mass) {
     this.radius = radius;
     this.mass = mass;
     this.x = middle,
-    this.y = middle
+        this.y = middle
 }
+
 
 CenterPlanet.prototype.build = function() {
 
@@ -151,7 +193,7 @@ CenterPlanet.prototype.build = function() {
 
 };
 
-var center = new CenterPlanet("central", "#FF0000", 75, massSun);
+var center = new CenterPlanet("central", "#FF0000", 50, massSun);
 center.build();
 
 /*var testSatlite = new Planet("satalite", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 30, 10);
@@ -195,6 +237,14 @@ function getRadius(planet) {
 function addToPlanetArr(name, fill, xPos, yPos, radius, mass) {
     var tempSpeed = getTanVelocity(new Planet(name, fill, xPos, yPos, radius, mass));
     planetsArr.push([new Planet(name, fill, xPos, yPos, radius, mass), angle, tempSpeed]);
+    planetsArr[numPlanets][0].build();
+    buildOrbitPath(planetsArr[numPlanets][0]);
+    numPlanets++;
+}
+
+function addToPlanetArrAlt(planet){
+    var tempSpeed = getTanVelocity(planet);
+    planetsArr.push([planet, angle, tempSpeed]);
     planetsArr[numPlanets][0].build();
     buildOrbitPath(planetsArr[numPlanets][0]);
     numPlanets++;

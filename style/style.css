@@ -5,7 +5,18 @@ html, body {
 }
 
 body{
-	background-color: #AE78FF;
+	
+	background-image: url(../images/bkgrnd.jpg);
+}
+
+#titleBar{
+	position: relative;
+    top: 0px;
+    color: black;
+    text-align: center;
+    -webkit-text-stroke: 1px #FFFC00;
+    font-family: "StarWars"
+    
 }
 
 canvas{
@@ -13,16 +24,33 @@ canvas{
 	background-size: cover;
 }
 
+.button{
+	margin-bottom: 20px;
+	display: block;
+	float: left; 
+	clear:right;
+	margin-bottom: : 20px;
+}
 #optionsSide{
-	display: inline-block;
+	display: block;
 	float: left;
 	clear: both;
+	vertical-align: top;
+	clear: both;
+
+}
+
+@font-face {
+        font-family: "StarWars";
+        src: url(Starjedi.ttf);
 }
 
 #simulator{
 	text-align: center;
-	display: inline-block;
+	display: inline;
 	float: middle;
 	clear: both;
+	align-content: center;
+	margin-left: 13%
 
 }
