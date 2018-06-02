@@ -1,3 +1,11 @@
+/*
+Daniel Rossos June 2018
+
+Simulator uses a mixture of both jQuery and jCanvas by Caleb Evans for the UI.
+
+Utilizes a combination of Kepler's Laws of Planetary motion as well as rotational dynamics to 
+create the orbits of planets
+*/
 var canvas = document.getElementById('canvas');
 initCanvas();
 var context = canvas.getContext("2d");
@@ -35,7 +43,7 @@ var oneAU = 149597900000;
 var secondsPerYear = 31557600;
 var mPerSToKmPerH = 3.6
     //standard 10 sec orbit *orbit of earth*
-    //TODO ADD SO CAN CHANGE SPEED OF ANIMATION
+    
 var standardOrbitPeriod = 31563692.627345186;
 var animationRefreshRate = .0125
 var relativeOrbitPeriod = 10;
@@ -68,7 +76,6 @@ $(function() {
                 } else {
                     valid = true;
 
-
                     //addToPlanetArr("satalite", "#00BAFF", canvas.width / 2, middle - pixelToAU, 20, massEarth);
                     addToPlanetArr("test" + planetsArr.length, colourArr[Math.floor(Math.random() * colourArr.length)], canvas.width / 2, middle - Number(distanceInput.val()) * pixelToAU, Number(radiusInput.val()) / 318.55, Number(massInput.val()));
                     //addToPlanetArr("test1", "#00BAFF", canvas.width / 2, canvas.height / radii[0], 20, 50);
@@ -92,7 +99,6 @@ $(function() {
 
                     center.mass = Number($("#centerMassInput").val());
 
-
                     //to update the visual speeds of orbits
                     var temp = planetsArr;
                     planetsArr = [];
@@ -106,11 +112,6 @@ $(function() {
 
                 }
 
-
-
-
-
-               
             }
         }
     });
@@ -210,11 +211,10 @@ testSatlite.build();*/
 
 /*var radius = getRadius(testSatlite);*/
 
-//TODO BUG WHERE PLANETS MOVE 90 DEGREE THEN START MOTION
+
 function animate() {
 
     for (var i = 0; i < planetsArr.length; i++) {
-
         //todo makes so each has unique speed
         // planetsArr[i][1] -= speed;
         planetsArr[i][1] += getAngleChange(i);
@@ -232,7 +232,6 @@ function animate() {
             width: planetsArr[i][0].radius,
             height: planetsArr[i][0].radius
         }, 10);
-
 
     }
 }
@@ -264,7 +263,6 @@ function getTanVelocity(planet) {
     //take radius/pixelToAU to see number of au then mult to get metere
     var test = (getRadius(planet) / pixelToAU * oneAU);
     return Math.sqrt(G * center.mass / (getRadius(planet) / pixelToAU * oneAU));
-
 }
 
 //using Kepler third law
@@ -285,12 +283,10 @@ function getAngleChange(planetIndex) {
     var orbitTime = getOrbitRefreshTime(planetIndex);
     //omega = v/r
     // var angVelo = getTanVelocity(planetsArr[planetIndex][0]) / (getRadius(planetsArr[planetIndex][0]) /pixelToAU * oneAU);
-
-
     var angVelo = (2 * Math.PI) / orbitTime;
     //omega * t = theta
     //right now sense of scale is so small that no noticable change
-    //TODO MAKE A SCALE SO IT ALL WORKS VISUALLY
+    
     // return angVelo *orbitTime;
     return getRelativeChange(orbitTime, angVelo);
 
