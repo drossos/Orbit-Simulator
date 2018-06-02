@@ -85,23 +85,32 @@ $(function() {
         modal: true,
         buttons: {
             "Edit Center Planet": function() {
-                center.mass = Number($("#centerMassInput").val());
-                //to update the visual speeds of orbits
-                var temp =  planetsArr;
-                planetsArr = [];
-                numPlanets=0;
-                for (i = 0; i < temp.length; i++) {
-                    jCanvas.removeLayer(temp[i][0].name + "Orbit");
-                    jCanvas.removeLayer(temp[i][0].name);
-                    addToPlanetArrAlt(temp[i][0]);
+
+                if (isNaN($("#centerMassInput").val())) {
+                    $("#nonNumPrompt").dialog("open");
+                } else {
+
+                    center.mass = Number($("#centerMassInput").val());
+
+
+                    //to update the visual speeds of orbits
+                    var temp = planetsArr;
+                    planetsArr = [];
+                    numPlanets = 0;
+                    for (i = 0; i < temp.length; i++) {
+                        jCanvas.removeLayer(temp[i][0].name + "Orbit");
+                        jCanvas.removeLayer(temp[i][0].name);
+                        addToPlanetArrAlt(temp[i][0]);
+                         $(this).dialog("close");
+                    }
 
                 }
 
-                
-                
 
 
-                $(this).dialog("close");
+
+
+               
             }
         }
     });
@@ -242,7 +251,7 @@ function addToPlanetArr(name, fill, xPos, yPos, radius, mass) {
     numPlanets++;
 }
 
-function addToPlanetArrAlt(planet){
+function addToPlanetArrAlt(planet) {
     var tempSpeed = getTanVelocity(planet);
     planetsArr.push([planet, angle, tempSpeed]);
     planetsArr[numPlanets][0].build();
