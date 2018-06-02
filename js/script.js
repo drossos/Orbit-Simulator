@@ -23,7 +23,7 @@ var allFields = $([]).add(radiusInput).add(massInput).add(distanceInput);
 var orbitInfo = $('#orbitInfo');
 var centeralInfo = $('#centralInfo');
 
-var colourArr = ["#275AFF", "#2DFA32", "#32FFF3", "#FF740E"];
+var colourArr = ["#275AFF", "#2DFA32", "#32FFF3", "#FF740E", "#A0FF7A", "#FFF600", "#AE00FF"];
 
 //planetsArr struct [planet, starting angle, speed]
 
